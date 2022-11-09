@@ -81,7 +81,7 @@ def get_specs_by_role(specs):
 @app.route("/")
 def index():
     """Specxplorer app page."""
-    with open("test.json") as f:
+    with open("specs.json") as f:
         specs = json.load(f)["_items"]
     common_roles = find_common_roles(specs)
     print(common_roles)
@@ -105,7 +105,7 @@ def index():
 @app.route("/spec/<name>")
 def spec(name):
     """Specxplorer spec item page."""
-    with open("test.json") as f:
+    with open("specs.json") as f:
         specs = json.load(f)["_items"]
     spec = [spec for spec in specs if spec.get("name", "") == name]
     if not spec:

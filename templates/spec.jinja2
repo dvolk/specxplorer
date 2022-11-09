@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <meta charset="UTF-8">
+  <title>Specxplorer</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="">
+  <style>
+    {{- css -}}
+  </style>
+  <link rel="stylesheet" href="/static/w3.css">
+  <script src=""></script>
+  <body>
+  <body class="w3-light-gray">
+    <header class="w3-container w3-black w3-bar">
+      <span class="w3-bar-item w3-large w3-right">
+        Specxplorer
+      </span>
+    </header>
+    <header class="w3-container w3-indigo">
+      <h2><i class="fa fa-bank fa-fw"></i> Details</h2>
+    </header>
+    <div class="w3-container w3-white">
+      <h3>Specification: {{ spec.get("name") }}</h3>
+      <p>
+        {{- htmlspec -}}
+      </p>
+    </div>
+  </body>
+</html>
