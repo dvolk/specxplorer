@@ -133,8 +133,12 @@ def main():
     global wsr_url
     wsr_url = os.environ.get("SX_WSR_URL")
     if not wsr_url:
-        print("Define the SX_WSR_URL environment variable as the workspace register url")
-        print("For example http://username:password@workspaceregister.com/specifications")
+        print(
+            "Define the SX_WSR_URL environment variable as the workspace register url"
+        )
+        print(
+            "For example http://username:password@workspaceregister.com/specifications"
+        )
         print("")
         sys.exit()
     specs = requests.get(wsr_url).text
