@@ -20,9 +20,8 @@
       <h2><i class="fa fa-bank fa-fw"></i> List</h2>
     </header>
     <div class="w3-container w3-panel w3-white">
-      <h3>Specifications</h3>
-      <p>
-        The follow roles are in all specifications and have been removed from the table:
+      <h3>Specifications by tag</h3>
+      <p> Common roles in all specs:
         {% for common_role in common_roles %}
           <span style="line-height: 2.2em; border-radius: 3px; padding: 5px;" class="{{ w3_color(common_role) }}">{{ common_role }}</span>
         {% endfor %}
@@ -30,6 +29,7 @@
           <table class="w3-table w3-border w3-hoverable">
             <thead>
               <th>Tag</th>
+              <th>Common roles</th>
               <th>Name</th>
               <th>Roles</th>
               <th>Instruments</th>
@@ -37,26 +37,30 @@
             <tbody>
               {% for spec in specs %}
                 <tr>
-
                   <td><span style="line-height: 2.2em; border-radius: 3px; padding: 5px;" class="{{ w3_color(spec.get("tag", "")) }}">{{ spec.get("tag") }}</span>
                   </td>
-
+                  <td>
+                  {% for key in common_roles_by_tag.keys()%}
+                    {% if key == spec.get("tag") %}
+                        {% for role in common_roles_by_tag[key] %}
+                            <span style="line-height: 2.2em; border-radius: 3px; padding: 5px;" class="{{ w3_color(role) }}"> {{ role }}</span>
+                        {% endfor %}
+                    {% endif %} 
+                    {% endfor %}
+                  </td>
                   <td>
                     <a href="{{ url_for("spec", name=spec.get('name')) }}"><b>{{ spec.get("name") }}</b></a>
                   </td>
-
                   <td>
                     {% for role in spec.get("parameters", {}).get("roles", []) %}
                       <span class="{{ w3_color(role) }}" style="line-height: 2.5em; border-radius: 3px; padding: 5px;">{{ role }}</span>
                     {% endfor %}
                   </td>
-
                   <td>
                     {% for instrument in spec.get("parameters", {}).get("instruments", []) %}
                       <span class="{{ w3_color(instrument) }}" style="line-height: 2.5em; border-radius: 3px; padding: 5px;">{{ instrument }}</span>
                     {% endfor %}
                   </td>
-
                 </tr>
               {% endfor %}
           </table>

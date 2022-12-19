@@ -68,6 +68,13 @@ def find_common_roles(specs):
         ret = ret.intersection(set(roles))
     return ret
 
+def find_tags(specs):
+    """return all tags"""
+    tags = []
+    for spec in specs:
+        tag = spec.get("tag")
+        tags.append(tag)
+    return set(tags)
 
 def get_specs_by_role(specs):
     """Return dict of specs by role."""
@@ -77,6 +84,15 @@ def get_specs_by_role(specs):
             ret[role].append(spec)
     return ret
 
+def get_specs_by_tag(specs):
+    """return dict of specs by tag."""
+    ret = collections.defaultdict(list)
+    tags = list(find_tags(specs))
+    for tag in tags:
+        for spec in specs:
+            if spec["tag"] == tag:
+                ret[tag].append(spec)
+    return ret
 
 @app.route("/")
 def index():
@@ -85,12 +101,16 @@ def index():
         specs = json.load(f)["_items"]
     common_roles = find_common_roles(specs)
     print(common_roles)
-    for spec in specs:
-        spec["parameters"]["roles"] = [
-            role
-            for role in spec.get("parameters").get("roles", [])
-            if role not in common_roles
-        ]
+    tags = list(find_tags(specs))
+    common_roles_by_tag = collections.defaultdict(list)
+    for tag in tags:
+        common_roles_by_tag[tag] = find_common_roles(get_specs_by_tag(specs)[tag]) - common_roles
+        print(f'{tag}: {common_roles_by_tag[tag]}')
+
+    for tag in tags:
+        for spec in specs:
+            spec["parameters"]["roles"] = list(set(spec["parameters"]["roles"]) - common_roles - common_roles_by_tag[tag])
+            
     specs = sorted(specs, key=lambda d: (d["tag"], d["name"]))
     specs_by_role = get_specs_by_role(specs)
     return flask.render_template(
@@ -98,6 +118,7 @@ def index():
         specs=specs,
         w3_color=w3_color,
         common_roles=common_roles,
+        common_roles_by_tag = common_roles_by_tag,
         specs_by_role=specs_by_role,
     )
 
