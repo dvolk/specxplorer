@@ -97,8 +97,6 @@ def get_specs_by_tag(specs):
 @app.route("/")
 def index():
     """Specxplorer app page."""
-    with open("specs.json") as f:
-        specs = json.load(f)["_items"]
     common_roles = find_common_roles(specs)
     print(common_roles)
     tags = list(find_tags(specs))
@@ -126,8 +124,6 @@ def index():
 @app.route("/spec/<name>")
 def spec(name):
     """Specxplorer spec item page."""
-    with open("specs.json") as f:
-        specs = json.load(f)["_items"]
     spec = [spec for spec in specs if spec.get("name", "") == name]
     if not spec:
         return flask.abort(404)
@@ -151,7 +147,6 @@ def spec(name):
 
 def main():
     """Start flask server."""
-    global wsr_url
     wsr_url = os.environ.get("SX_WSR_URL")
     if not wsr_url:
         print(
@@ -162,12 +157,23 @@ def main():
         )
         print("")
         sys.exit()
-    specs = requests.get(wsr_url).text
-    with open("specs.json", "w") as f:
-        f.write(specs)
 
+    try:
+        specs = requests.get(wsr_url).text
+        with open("specs.json", "w") as f:
+            f.write(specs)
+    except requests.ConnectionError as e:
+        print("Use local spec")
+
+    try:
+        with open("specs.json") as f:
+            specs = json.load(f)["_items"]
+    except:
+        print("No spec file found, existing...")
+        sys.exit(1)
+        
     app.run(port=4328, debug=True)
 
-
 if __name__ == "__main__":
+    global wsr_url, specs
     main()
