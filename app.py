@@ -56,6 +56,14 @@ def w3_color(text):
         i = i + 1
     return col[text]
 
+def load_specs(filename):
+    try:
+        with open(filename) as f:
+            specs = json.load(f)["_items"]
+    except FileNotFoundError:
+        print("No spec file found, existing...")
+        sys.exit(1)
+    return specs
 
 def find_common_roles(specs):
     """Return roles that are common to all specs."""
@@ -101,7 +109,7 @@ def get_specs_by_tag(specs):
 @app.route("/")
 def index():
     """Specxplorer app page."""
-    global specs
+    specs = load_specs(filename)
     common_roles = find_common_roles(specs)
     print(common_roles)
     tags = list(find_tags(specs))
@@ -135,6 +143,7 @@ def index():
 @app.route("/spec/<name>")
 def spec(name):
     """Specxplorer spec item page."""
+    specs = load_specs(filename)
     spec = [spec for spec in specs if spec.get("name", "") == name]
     if not spec:
         return flask.abort(404)
@@ -158,9 +167,6 @@ def spec(name):
 
 def main():
     """Start flask server."""
-
-    global specs
-
     wsr_url = os.environ.get("SX_WSR_URL")
     if not wsr_url:
         print(
@@ -180,16 +186,10 @@ def main():
     except requests.ConnectionError:
         print("Use local spec")
 
-    try:
-        with open("specs.json") as f:
-            specs = json.load(f)["_items"]
-        print("loaded specs from file")
-    except FileNotFoundError:
-        print("No spec file found, existing...")
-        sys.exit(1)
-
     app.run(port=4328, debug=True)
 
 
 if __name__ == "__main__":
+    global filename
+    filename = "specs.json"
     main()
